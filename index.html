@@ -1,109 +1,25 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle do Agente de IA</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        select, button { padding: 10px; margin: 10px; font-size: 16px; cursor: pointer; }
-        #status { font-weight: bold; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Controle de Agente IA</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+  <div class="container">
     <h1>Controle do Agente de IA</h1>
-
+    <div id="status">Carregando...</div>
     <label for="leadSelect">Selecione um Lead:</label>
     <select id="leadSelect">
-        <option value="">Carregando...</option>
+      <option value="">Selecione</option>
     </select>
-
-    <button id="ativar">Ativar IA</button>
-    <button id="pausar">Pausar IA</button>
-
-    <p>Status Atual: <span id="status">Carregando...</span></p>
-
-    <script>
-        // Configurar Supabase
-        const SUPABASE_URL = "https://qjdggpdlwhiydrabwyyk.supabase.co";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqZGdncGRsd2hpeWRyYWJ3eXlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0Nzg4NTAsImV4cCI6MjA1ODA1NDg1MH0.VmmnOuz3Xkt40MdztobCiXY1oofzaECF7Kg7U-SeEQg";
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // Carregar todos os leads e preencher o dropdown
-        async function carregarLeads() {
-            const { data, error } = await supabase
-                .from("leads")
-                .select("id, nome, status")
-                .order("nome", { ascending: true });
-
-            if (error) {
-                console.error("Erro ao buscar leads:", error);
-                return;
-            }
-
-            const leadSelect = document.getElementById("leadSelect");
-            leadSelect.innerHTML = "<option value=''>Selecione um Lead</option>";
-
-            data.forEach(lead => {
-                const option = document.createElement("option");
-                option.value = lead.id;
-                option.textContent = `${lead.nome} (ID: ${lead.id})`;
-                leadSelect.appendChild(option);
-            });
-        }
-
-        // Buscar status do lead selecionado
-        async function buscarStatus() {
-            const leadId = document.getElementById("leadSelect").value;
-            if (!leadId) {
-                document.getElementById("status").textContent = "Selecione um lead";
-                return;
-            }
-
-            const { data, error } = await supabase
-                .from("leads")
-                .select("status")
-                .eq("id", leadId)
-                .single();
-
-            if (error || !data) {
-                console.error("Erro ao buscar status:", error);
-                document.getElementById("status").textContent = "Erro ao carregar status";
-                return;
-            }
-
-            document.getElementById("status").textContent = data.status || "Desconhecido";
-        }
-
-        // Atualizar status do lead
-        async function atualizarStatus(novoStatus) {
-            const leadId = document.getElementById("leadSelect").value;
-            if (!leadId) {
-                alert("Por favor, selecione um lead.");
-                return;
-            }
-
-            const { error } = await supabase
-                .from("leads")
-                .update({ status: novoStatus })
-                .eq("id", leadId);
-
-            if (error) {
-                console.error("Erro ao atualizar status:", error);
-                return;
-            }
-
-            alert(`IA ${novoStatus} para o lead ${leadId}`);
-            buscarStatus();
-        }
-
-        document.getElementById("ativar").addEventListener("click", () => atualizarStatus("ativo"));
-        document.getElementById("pausar").addEventListener("click", () => atualizarStatus("pausado"));
-        document.getElementById("leadSelect").addEventListener("change", buscarStatus);
-
-        // Carregar a lista de leads ao iniciar
-        carregarLeads();
-    </script>
+    <div class="buttons">
+      <button onclick="atualizarModo('true')">Pausar IA</button>
+      <button onclick="atualizarModo('false')">Retomar IA</button>
+    </div>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>
